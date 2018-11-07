@@ -161,7 +161,27 @@ end
 
 class QuestionFollows
 
+  def self.followers_for_question_id(question_id)
+    data = QuestionsDatabase.instance.execute(<<-SQL, question_id)
+      SELECT u.id, fname, lname
+      FROM question_follows q
+      JOIN users u
+      ON u.id = q.user_id
+      WHERE question_id = ?
+    SQL
+    data.map{|e| User.new(e)}
+  end
 
+  def self.followed_questions_for_user_id(user_id)
+    data = QuestionsDatabase.instance.execute(<<-SQL, user_id)
+      SELECT u.id, fname, lname
+      FROM question_follows q
+      JOIN users u
+      ON u.id = q.user_id
+      WHERE user_id = ?
+    SQL
+    data.map{|e| User.new(e)}
+  end
 end
 
 class QuestionLikes

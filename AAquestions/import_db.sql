@@ -23,11 +23,14 @@ CREATE TABLE questions (
 );
 
 CREATE TABLE question_follows (
-  user_id INTEGER PRIMARY KEY,
+  id INTEGER PRIMARY KEY,
+  user_id INTEGER,
   question_id INTEGER,
 
   FOREIGN KEY (question_id)
-    REFERENCES questons(id)
+    REFERENCES questions(id)
+  FOREIGN KEY (user_id)
+    REFERENCES users(id)
 );
 
 CREATE TABLE replies (
@@ -82,3 +85,11 @@ VALUES
     -- ('', '', '', '', ''),
     -- ('', '', '', '', ''),
     -- ('', '', '', '', ''),
+
+    INSERT INTO
+      question_follows (user_id, question_id)
+    VALUES
+      (1,6),
+      (1,4),
+      (2,5),
+      (3,7);
