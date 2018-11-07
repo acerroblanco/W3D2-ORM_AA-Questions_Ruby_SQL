@@ -12,7 +12,7 @@ class QuestionsDatabase < SQLite3::Database
 
 end
 
-class Users
+class User
 
   attr_accessor :id, :fname, :lname
 
@@ -26,7 +26,7 @@ class Users
       FROM users
       WHERE id = ?;
     SQL
-    data.map { |e| Users.new(e) }
+    data.map { |e| User.new(e) }
   end
 
   def self.find_by_name(*name)
@@ -35,7 +35,7 @@ class Users
       FROM users
       WHERE fname = ? OR lname = ?;
     SQL
-    data.map { |e| Users.new(e) }
+    data.map { |e| User.new(e) }
   end
 
   def initialize(options_hash)
@@ -50,12 +50,12 @@ class Users
       FROM questions
       WHERE author_id = ?;
     SQL
-    data.map { |e| Questions.new(e) }
+    data.map { |e| Question.new(e) }
   end
 
 end
 
-class Questions
+class Question
 
   attr_accessor :id, :title, :body, :author_id
 
@@ -65,7 +65,7 @@ class Questions
       FROM questions
       WHERE author_id = ?;
     SQL
-    data.map { |e| Questions.new(e) }
+    data.map { |e| Question.new(e) }
   end
 
   def initialize(options_hash)
@@ -78,31 +78,38 @@ class Questions
   def author
     data = QuestionsDatabase.instance.execute(<<-SQL, @author_id)
       SELECT *
-      FROM questions
-      WHERE author_id = ?;
+      FROM users
+      WHERE id = ?;
     SQL
-    data.map { |e| Questions.new(e) }
+    data.map { |e| User.new(e) }
   end
+
+  def replies
+    Reply.find_by_question_id(@id)
+  end
+
 end
 
-class Replies
+class Reply
+
+  attr_accessor :id, :subject_question_id, :subject_question_title, :question, :parent_reply, :reply_author_id
 
   def self.find_by_user_id(user_id)
     data = QuestionsDatabase.instance.execute(<<-SQL, user_id)
       SELECT *
       FROM replies
-      WHERE user_id = ?;
+      WHERE reply_author_id = ?;
     SQL
-    data.map { |e| Replies.new(e) }
+    data.map { |e| Reply.new(e) }
   end
 
   def self.find_by_question_id(question_id)
     data = QuestionsDatabase.instance.execute(<<-SQL, question_id)
       SELECT *
       FROM replies
-      WHERE question_id = ?;
+      WHERE subject_question_id = ?;
     SQL
-    data.map { |e| Replies.new(e) }
+    data.map { |e| Reply.new(e) }
   end
 
   def initialize(options_hash)
@@ -112,6 +119,42 @@ class Replies
     @question = options_hash['question']
     @parent_reply = options_hash['parent_reply']
     @reply_author_id = options_hash['reply_author_id']
+  end
+
+  def author
+    data = QuestionsDatabase.instance.execute(<<-SQL, @reply_author_id)
+      SELECT *
+      FROM users
+      WHERE id = ?;
+    SQL
+    data.map { |e| User.new(e) }
+  end
+
+  def question
+    data = QuestionsDatabase.instance.execute(<<-SQL, @subject_question_id)
+      SELECT *
+      FROM questions
+      WHERE id = ?;
+    SQL
+    data.map { |e| Question.new(e) }
+  end
+
+  def parent_reply
+    data = QuestionsDatabase.instance.execute(<<-SQL, @parent_reply)
+      SELECT *
+      FROM replies
+      WHERE id = ?;
+    SQL
+    data.map { |e| Reply.new(e) }
+  end
+
+  def child_reply
+    data = QuestionsDatabase.instance.execute(<<-SQL, @id)
+      SELECT *
+      FROM replies
+      WHERE parent_reply = ?;
+    SQL
+    data.map { |e| Reply.new(e) }
   end
 
 end

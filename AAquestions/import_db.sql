@@ -57,11 +57,28 @@ INSERT INTO
 VALUES
   ('Armando', 'C'),
   ('Theo', 'Obbard'),
-  ('Ryan', 'Mapa');
+  ('Ryan', 'Mapa'),
+  ('Gal', 'Gadot'),
+  ('Bruce', 'Willis'),
+  ('Audrey', 'Plaza');
 
   INSERT INTO
     questions (title, body, author_id)
   VALUES
     ('HELP W JOINS', 'I need help with joins', 1),
     ('Help w life', 'eeeerg help meh', 2),
-    ('Am I cool?', 'need an answer asap', 3);
+    ('Am I cool?', 'need an answer asap', 3),
+    ('Am I Wonder Woman?', 'I have multiple personality disorder', 4),
+    ('How do I make lasagne?', 'Need an answer asap', 5),
+    ('Are you my uber driver?', 'I thought I ordered a Lyft, or something', 6),
+    ('Where''s Chase?', 'Why is he not at circle time?', 3),
+    ('Where is Chris Pine?', 'He''s my co-pilot', 4);
+
+
+  INSERT INTO
+    replies(subject_question_id, subject_question_title, question, parent_reply, reply_author_id)
+  VALUES
+    (1, 'HELP W JOINS', 'I can help you with JOINS!', NULL, 4);
+    -- ('', '', '', '', ''),
+    -- ('', '', '', '', ''),
+    -- ('', '', '', '', ''),
